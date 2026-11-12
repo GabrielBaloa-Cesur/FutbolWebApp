@@ -43,13 +43,7 @@ Object oSelectEntrenador is a cWebView
         Set pbServerOnRowClick to True
         Set pbFillHeight to True
         Set pbShowHeader to False
-        Set piSortColumn to 0
-
-        Object oentrenadorID is a cWebColumn
-            Entry_Item entrenador.ID
-            Set psCaption to "entrenador.ID"
-            Set piWidth to 149
-        End_Object 
+        Set piSortColumn to 0 
 
         Object oentrenadorNombre is a cWebColumn
             Entry_Item entrenador.Nombre

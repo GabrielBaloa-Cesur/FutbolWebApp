@@ -35,12 +35,6 @@ Object oSelectLiga is a cWebView
         Set pbShowHeader to False
         Set piSortColumn to 0
 
-        Object oligaID is a cWebColumn
-            Entry_Item liga.ID
-            Set psCaption to "liga.ID"
-            Set piWidth to 149
-        End_Object 
-
         Object oligaNombre is a cWebColumn
             Entry_Item liga.Nombre
             Set psCaption to "liga.Nombre"
