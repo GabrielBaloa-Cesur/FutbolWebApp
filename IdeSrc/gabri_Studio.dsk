@@ -7,8 +7,17 @@ GroupCount=1
 HorizontalGroups=1
 [TabGroup0]
 GroupSize=40
-SelectedTab=5
+SelectedTab=3
 [Window0]
+Filename=Workspace Dashboard
+ViewType=101
+Top=31
+Left=0
+Bottom=940
+Right=2157
+TabIndex=0
+TabGroup=0
+[Window1]
 Filename=C:\DataFlex Projects\FutbolWebApp\AppSrc\WebApp.src
 ViewType=1
 Top=31
@@ -19,78 +28,58 @@ CursorLine=56
 CursorColumn=48
 TabIndex=1
 TabGroup=0
-[Window1]
-Filename=C:\DataFlex Projects\FutbolWebApp\AppSrc\ZoomPosicion.wo
-ViewType=1
-Top=31
-Left=0
-Bottom=940
-Right=2157
-CursorLine=34
-CursorColumn=49
-TabIndex=2
-TabGroup=0
 [Window2]
-Filename=Workspace Dashboard
-ViewType=101
-Top=31
-Left=0
-Bottom=940
-Right=2157
-TabIndex=0
-TabGroup=0
-[Window3]
 Filename=C:\DataFlex Projects\FutbolWebApp\AppSrc\ZoomEquipo.wo
 ViewType=1
 Top=31
 Left=0
 Bottom=940
 Right=2157
-CursorLine=48
-CursorColumn=34
-TabIndex=3
+CursorLine=76
+CursorColumn=37
+TabIndex=2
 TabGroup=0
-[Window4]
-Filename=C:\DataFlex Projects\FutbolWebApp\AppSrc\SelectLiga.wo
-ViewType=1
-Top=31
-Left=0
-Bottom=940
-Right=2157
-CursorLine=0
-CursorColumn=0
-TabIndex=7
-TabGroup=0
-[Window5]
-Filename=C:\DataFlex Projects\FutbolWebApp\AppSrc\ZoomJugador.wo
-ViewType=1
-Top=31
-Left=0
-Bottom=940
-Right=2157
-CursorLine=43
-CursorColumn=49
-TabIndex=4
-TabGroup=0
-[Window6]
-Filename=C:\DataFlex Projects\FutbolWebApp\AppSrc\ZoomLiga.wo
-ViewType=1
-Top=31
-Left=0
-Bottom=940
-Right=2157
-CursorLine=57
-CursorColumn=33
-TabIndex=6
-TabGroup=0
-[Window7]
+[Window3]
 Filename=C:\DataFlex Projects\FutbolWebApp\AppSrc\Dashboard.wo
 ViewType=1
 Top=31
 Left=0
 Bottom=940
 Right=2157
-CursorLine=45
-CursorColumn=39
+CursorLine=79
+CursorColumn=25
+TabIndex=4
+TabGroup=0
+[Window4]
+Filename=C:\DataFlex Projects\FutbolWebApp\AppSrc\ZoomEntrenador.wo
+ViewType=1
+Top=31
+Left=0
+Bottom=940
+Right=2157
+CursorLine=96
+CursorColumn=12
+TabIndex=6
+TabGroup=0
+[Window5]
+Filename=C:\DataFlex Projects\FutbolWebApp\AppSrc\ZoomLiga.wo
+ViewType=1
+Top=31
+Left=0
+Bottom=940
+Right=2157
+CursorLine=32
+CursorColumn=0
 TabIndex=5
+TabGroup=0
+[Window6]
+Filename=C:\DataFlex Projects\FutbolWebApp\AppSrc\ZoomJugador.wo
+ViewType=1
+Top=31
+Left=0
+Bottom=940
+Right=2157
+CursorLine=135
+CursorColumn=29
+TabIndex=3
 TabGroup=0

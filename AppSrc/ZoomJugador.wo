@@ -74,29 +74,38 @@ Object oZoomJugador is a cWebView
                 Set piColumnIndex to 0
                 Set peLabelPosition to lpTop
                 Set psLabel to "Equipo"
-                Set pbPromptButton to True
-    
-    // ToDo: Fill in the from-child parent Select view object name for navigate forward
-    //            WebRegisterPath ntNavigateForward oSelectView
-    
-                Procedure OnPrompt
+            End_Object 
+            
+            Object oBtnVerEquipo is a cWebButton
+                Set piColumnSpan to 0
+                Set psCaption to "Ver detalles del Equipo"
+                Set psCSSClass to "WebButton"
+                
+                WebRegisterPath ntNavigateForward oZoomEquipo
+                
+                Procedure OnClick
                     Send NavigatePath
                 End_Procedure
-                
-            End_Object 
-    
+            End_Object
+
             Object oliga_Nombre is a cWebForm
                 Entry_Item liga.Nombre
                 Set piColumnSpan to 12
                 Set piColumnIndex to 0
                 Set peLabelPosition to lpTop
                 Set psLabel to "Liga"
-                Set pbPromptButton to True
+            End_Object
+            
+            Object oBtnVerLiga is a cWebButton
+                Set piColumnSpan to 0
+                Set psCaption to "Ver detalles de la Liga"
+                Set psCSSClass to "WebButton"
                 
-                Procedure OnPrompt
-                       Send NavigatePath
+                WebRegisterPath ntNavigateForward oZoomLiga
+                
+                Procedure OnClick
+                    Send NavigatePath
                 End_Procedure
-                
             End_Object
             
         End_Object
@@ -114,6 +123,19 @@ Object oZoomJugador is a cWebView
                 Set psLabel to "Nacionalidad"
             End_Object
             
+        End_Object
+        
+        Object oBtnPosiciones is a cWebButton
+            Set piColumnSpan to 0
+            Set psCaption to "Ver Catálogo de Posiciones"
+            Set psCSSClass to "WebButton"
+            
+            // Navega a la vista de selección de posiciones
+            WebRegisterPath ntNavigateForward oSelectPosicion
+            
+            Procedure OnClick
+                Send NavigatePath
+            End_Procedure
         End_Object
         
     End_Object 
