@@ -29,22 +29,21 @@ Object oZoomPosicion is a cWebView
     Object oWebMainPanel is a cWebPanel
         Set piColumnCount to 12
         WebSetResponsive piColumnCount rmMobile to 4
+        
+        Object oPosicionGroup is a cWebGroup
+            Set piColumnSpan to 5
+            Set psCSSClass to "BordesRedondeados"
+        
+            Object oposicionNombre is a cWebForm
+                Entry_Item posicion.Nombre
+                Set piColumnSpan to 12
+                Set piColumnIndex to 0
+                Set peLabelPosition to lpTop
+                Set psLabel to "Nombre"
+            End_Object 
+            
+        End_Object
 
-        Object oposicionID is a cWebForm
-            Entry_Item posicion.ID
-            Set piColumnSpan to 3
-            Set piColumnIndex to 0
-            Set peLabelPosition to lpTop
-            Set psLabel to "ID Posicion"
-        End_Object 
-
-        Object oposicionNombre is a cWebForm
-            Entry_Item posicion.Nombre
-            Set piColumnSpan to 12
-            Set piColumnIndex to 0
-            Set peLabelPosition to lpTop
-            Set psLabel to "Nombre"
-        End_Object 
     End_Object 
 
     Object oActionGroup is a cWebMenuGroup

@@ -38,13 +38,7 @@ Object oSelectEquipo is a cWebView
         Set pbServerOnRowClick to True
         Set pbFillHeight to True
         Set pbShowHeader to False
-        Set piSortColumn to 0
-
-        Object oequipoID is a cWebColumn
-            Entry_Item equipo.ID
-            Set psCaption to "equipo.ID"
-            Set piWidth to 149
-        End_Object 
+        Set piSortColumn to 0 
 
         Object oequipoNombre is a cWebColumn
             Entry_Item equipo.Nombre

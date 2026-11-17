@@ -1,0 +1,15 @@
+/* 1. Bordes redondeados para Grupos y Paneles (Ej. ZoomJugador) */
+.BordesRedondeados,
+.BordesRedondeados > .WebGrp_Inner,
+.BordesRedondeados > .WebCon_Inner,
+.BordesRedondeados fieldset {
+    border-radius: 12px !important;
+    overflow: hidden !important;
+}
+
+/* 2. Bordes redondeados específicos para los Tiles (Ej. Dashboard) */
+.Tile.BordesRedondeados,
+.Tile.BordesRedondeados .WebCon_Sizer {
+    border-radius: 12px !important;
+    overflow: hidden !important;
+}
