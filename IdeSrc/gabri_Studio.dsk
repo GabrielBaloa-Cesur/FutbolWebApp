@@ -7,8 +7,19 @@ GroupCount=1
 HorizontalGroups=1
 [TabGroup0]
 GroupSize=40
-SelectedTab=0
+SelectedTab=1
 [Window0]
+Filename=C:\DataFlex Projects\FutbolWebApp\AppSrc\ZoomEntrenador.wo
+ViewType=1
+Top=31
+Left=0
+Bottom=940
+Right=1830
+CursorLine=117
+CursorColumn=22
+TabIndex=0
+TabGroup=0
+[Window1]
 Filename=C:\DataFlex Projects\FutbolWebApp\AppSrc\ZoomEquipo.wo
 ViewType=1
 Top=31
@@ -18,15 +29,4 @@ Right=1830
 CursorLine=175
 CursorColumn=0
 TabIndex=1
-TabGroup=0
-[Window1]
-Filename=C:\DataFlex Projects\FutbolWebApp\AppSrc\ZoomLiga.wo
-ViewType=1
-Top=31
-Left=0
-Bottom=940
-Right=1830
-CursorLine=207
-CursorColumn=10
-TabIndex=0
 TabGroup=0

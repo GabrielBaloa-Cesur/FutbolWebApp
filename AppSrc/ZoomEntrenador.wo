@@ -30,8 +30,30 @@ Object oZoomEntrenador is a cWebView
     End_Object 
 
     Object oentrenador_DD is a centrenadorDataDictionary
-        Set DDO_Server To oequipo_DD
-    End_Object 
+        Set DDO_Server to oequipo_DD
+
+        Procedure Request_Save
+            Handle hoSQLMngr hdbc hstmt
+            Integer iEntrenadorID iEquipoID
+
+            Get Field_Current_Value Field entrenador.ID to iEntrenadorID
+            Get Field_Current_Value of oequipo_DD Field equipo.ID to iEquipoID
+
+            // Si hay un equipo asignado, pasamos a NULL a cualquier otro entrenador que lo ocupe
+            If (iEquipoID > 0) Begin
+                Get Create (RefClass(cSQLHandleManager)) to hoSQLMngr
+                Get SQLFileConnect of hoSQLMngr entrenador.File_number to hdbc
+                Get SQLOpen of hdbc to hstmt
+                Send SQLExecDirect of hstmt ("UPDATE entrenador SET EquipoID = NULL WHERE EquipoID = " + String(iEquipoID) + " AND ID <> " + String(iEntrenadorID))
+                Send SQLClose of hstmt
+                Send SQLDisconnect of hdbc
+                Send Destroy of hoSQLMngr
+            End
+
+            // Ahora DataFlex guarda al nuevo entrenador sin conflicto de clave única
+            Forward Send Request_Save
+        End_Procedure
+    End_Object
 
     Set Main_DD To oentrenador_DD
     Set Server  To oentrenador_DD
@@ -114,6 +136,22 @@ Object oZoomEntrenador is a cWebView
                         // Cerramos la vista para refrescar los datos al volver
                         Send NavigateClose Self
                     End
+                End_Procedure
+            End_Object
+            
+            Object oBtnContratarEquipo is a cWebButton
+                Set piColumnSpan to 0
+                Set psCaption to "Contratar / Cambiar Equipo"
+                Set psCSSClass to "WebButton"
+
+                WebRegisterPath ntNavigateForward oSelectEquipo
+
+                Procedure OnClick
+                    Send NavigatePath
+                End_Procedure
+
+                Procedure OnGetNavigateForwardData tWebNavigateData ByRef NavigateData Handle hoToView
+                    Move nfFromMain to NavigateData.eNavigateType
                 End_Procedure
             End_Object
 
@@ -260,6 +298,7 @@ Object oZoomEntrenador is a cWebView
         Send SetActionButtons
 
     End_Procedure
+    
 
-End_Object 
+    End_Object 
 End_Object 

@@ -7,6 +7,7 @@ Use cWebPanel.pkg
 Use cWebMenuGroup.pkg
 Use cWebMenuItem.pkg
 Use cWebForm.pkg
+Use sql.pkg
 
 Use cligaDataDictionary.dd
 Use cequipoDataDictionary.dd
@@ -45,6 +46,24 @@ Object oZoomEquipo is a cWebView
                 Set peLabelPosition to lpTop
                 Set psLabel to "Equipo"
             End_Object  
+            
+            Object oBtnContratarEntrenador is a cWebButton
+                Set piColumnSpan to 0
+                Set psCaption to "Contratar Entrenador"
+                Set psCSSClass to "WebButton"
+
+                WebRegisterPath ntNavigateForward oSelectEntrenador
+
+                Procedure OnClick
+                    Send NavigatePath
+                End_Procedure
+
+                // Forzamos nfFromMain para que SelectEntrenador muestre todos los entrenadores
+                // y al hacer clic nos devuelva el seleccionado en OnNavigateBack
+                Procedure OnGetNavigateForwardData tWebNavigateData ByRef NavigateData Handle hoToView
+                    Move nfFromMain to NavigateData.eNavigateType
+                End_Procedure
+            End_Object
             
          End_Object
          
@@ -125,16 +144,69 @@ Object oZoomEquipo is a cWebView
         End_Object 
     End_Object 
 
+    // Comprueba en MySQL si el equipo actual ya tiene un entrenador asignado
+    Function TieneEntrenador Integer iEquipoID Returns Boolean
+        Handle hoSQLMngr hdbc hstmt
+        Integer iFetchResult
+        Boolean bTiene
+
+        Move False to bTiene
+        If (iEquipoID > 0) Begin
+            Get Create (RefClass(cSQLHandleManager)) to hoSQLMngr
+            Get SQLFileConnect of hoSQLMngr equipo.File_number to hdbc
+            Get SQLOpen of hdbc to hstmt
+            Send SQLExecDirect of hstmt ("SELECT ID FROM entrenador WHERE EquipoID = " + String(iEquipoID) + " LIMIT 1")
+            Get SQLFetch of hstmt to iFetchResult
+            If (iFetchResult <> 0) Begin
+                Move True to bTiene
+            End
+            Send SQLClose of hstmt
+            Send SQLDisconnect of hdbc
+            Send Destroy of hoSQLMngr
+        End
+
+        Function_Return bTiene
+    End_Function
+
+    // Se ejecuta cuando el usuario elige un entrenador en SelectEntrenador
+    Procedure OnNavigateBack tWebNavigateData NavigateData Integer hoClosedView
+        Handle hoSQLMngr hdbc hstmt
+        Integer iEquipoID iEntrenadorID
+
+        If (hoClosedView = oSelectEntrenador) Begin
+            Get Field_Current_Value of oequipo_DD Field equipo.ID to iEquipoID
+            Get Field_Current_Value of (Main_DD(hoClosedView)) Field entrenador.ID to iEntrenadorID
+
+            If (iEquipoID > 0 and iEntrenadorID > 0) Begin
+                Get Create (RefClass(cSQLHandleManager)) to hoSQLMngr
+                Get SQLFileConnect of hoSQLMngr equipo.File_number to hdbc
+                Get SQLOpen of hdbc to hstmt
+
+                // 1. Por seguridad, si el equipo tenía entrenador, pasa a estar libre
+                Send SQLExecDirect of hstmt ("UPDATE entrenador SET EquipoID = NULL WHERE EquipoID = " + String(iEquipoID))
+                // 2. Asignamos el nuevo entrenador a este equipo
+                Send SQLExecDirect of hstmt ("UPDATE entrenador SET EquipoID = " + String(iEquipoID) + " WHERE ID = " + String(iEntrenadorID))
+
+                Send SQLClose of hstmt
+                Send SQLDisconnect of hdbc
+                Send Destroy of hoSQLMngr
+
+                // Actualizamos los botones para que "Contratar Entrenador" se oculte
+                Send SetActionButtons
+            End
+        End
+    End_Procedure
+
     Procedure SetActionButtons
         tWebNavigateData NavigateData
-        Boolean bHasRecord
+        Boolean bHasRecord bTieneEntrenador
+        Integer iEquipoID
         Handle hoDD
 
         Get Server to hoDD
         Get GetNavigateData to NavigateData
         Get HasRecord of hoDD to bHasRecord
 
-        // let's hide all buttons and then Show the ones we want
         WebSet pbRender of oEditBtn to False
         WebSet pbRender of oSaveBtn to False
         WebSet pbRender of oCancelChangesBtn to False
@@ -148,6 +220,14 @@ Object oZoomEquipo is a cWebView
             WebSet pbRender of oCancelChangesBtn to True
             WebSet pbRender of oDeleteBtn to bHasRecord
         End
+
+        // Solo mostramos el botón si el equipo existe y NO tiene entrenador
+        Move False to bTieneEntrenador
+        If (bHasRecord) Begin
+            Get Field_Current_Value of oequipo_DD Field equipo.ID to iEquipoID
+            Get TieneEntrenador iEquipoID to bTieneEntrenador
+        End
+        WebSet pbRender of oBtnContratarEntrenador to (bHasRecord and not(bTieneEntrenador))
     End_Procedure
 
     Procedure OnViewSaved Handle hoServer Boolean bChanged
