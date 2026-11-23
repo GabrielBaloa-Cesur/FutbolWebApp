@@ -7,6 +7,8 @@ Use cWebPanel.pkg
 Use cWebMenuGroup.pkg
 Use cWebMenuItem.pkg
 Use cWebForm.pkg
+Use sql.pkg
+Use cWebCombo.pkg
 
 Use cligaDataDictionary.dd
 Use cequipoDataDictionary.dd
@@ -25,15 +27,37 @@ Object oZoomEntrenador is a cWebView
     End_Object 
 
     Object oequipo_DD is a cequipoDataDictionary
-        Set DDO_Server To oliga_DD
+        Set DDO_Server to oliga_DD
     End_Object 
 
     Object oentrenador_DD is a centrenadorDataDictionary
-        Set DDO_Server To oequipo_DD
-    End_Object 
+        Set DDO_Server to oequipo_DD
 
-    Set Main_DD To oentrenador_DD
-    Set Server  To oentrenador_DD
+        Procedure Request_Save
+            Handle hoSQLMngr hdbc hstmt
+            Integer iEntrenadorID iEquipoID
+
+            Get Field_Current_Value Field entrenador.ID to iEntrenadorID
+            Get Field_Current_Value of oequipo_DD Field equipo.ID to iEquipoID
+
+            // Si hay un equipo asignado, pasamos a NULL a cualquier otro entrenador que lo ocupe
+            If (iEquipoID > 0) Begin
+                Get Create (RefClass(cSQLHandleManager)) to hoSQLMngr
+                Get SQLFileConnect of hoSQLMngr entrenador.File_number to hdbc
+                Get SQLOpen of hdbc to hstmt
+                Send SQLExecDirect of hstmt ("UPDATE entrenador SET EquipoID = NULL WHERE EquipoID = " + String(iEquipoID) + " AND ID <> " + String(iEntrenadorID))
+                Send SQLClose of hstmt
+                Send SQLDisconnect of hdbc
+                Send Destroy of hoSQLMngr
+            End
+
+            // Ahora DataFlex guarda al nuevo entrenador sin conflicto de clave única
+            Forward Send Request_Save
+        End_Procedure
+    End_Object
+
+    Set Main_DD to oentrenador_DD
+    Set Server  to oentrenador_DD
 
 
     Object oWebMainPanel is a cWebPanel
@@ -86,13 +110,58 @@ Object oZoomEntrenador is a cWebView
                     Send NavigatePath
                 End_Procedure
             End_Object
+            
+            Object oBtnDespedir is a cWebButton
+                Set piColumnSpan to 0
+                Set psCaption to "Despedir"
+                Set psCSSClass to "WebButton"
 
-           Object oliga_Nombre is a cWebForm
-               Entry_Item liga.Nombre
-               Set piColumnSpan to 12
-               Set piColumnIndex to 0
-               Set peLabelPosition to lpTop
-               Set psLabel to "Liga"
+                Procedure OnClick
+                    Handle hoSQLMngr hdbc hstmt
+                    Integer iEntrenadorID
+                    Boolean bHasEquipo
+
+                    Get HasRecord of oequipo_DD to bHasEquipo
+                    If (bHasEquipo) Begin
+                        Get Field_Current_Value of oentrenador_DD Field entrenador.ID to iEntrenadorID
+
+                        // Ejecutamos UPDATE con NULL real en MySQL
+                        Get Create (RefClass(cSQLHandleManager)) to hoSQLMngr
+                        Get SQLFileConnect of hoSQLMngr entrenador.File_number to hdbc
+                        Get SQLOpen of hdbc to hstmt
+                        Send SQLExecDirect of hstmt ("UPDATE entrenador SET EquipoID = NULL WHERE ID = " + String(iEntrenadorID))
+                        Send SQLClose of hstmt
+                        Send SQLDisconnect of hdbc
+                        Send Destroy of hoSQLMngr
+
+                        // Cerramos la vista para refrescar los datos al volver
+                        Send NavigateClose Self
+                    End
+                End_Procedure
+            End_Object
+            
+            Object oBtnContratarEquipo is a cWebButton
+                Set piColumnSpan to 0
+                Set psCaption to "Contratar / Cambiar Equipo"
+                Set psCSSClass to "WebButton"
+
+                WebRegisterPath ntNavigateForward oSelectEquipo
+
+                Procedure OnClick
+                    Send NavigatePath
+                End_Procedure
+
+                Procedure OnGetNavigateForwardData tWebNavigateData ByRef NavigateData Handle hoToView
+                    Move nfFromMain to NavigateData.eNavigateType
+                End_Procedure
+            End_Object
+
+            Object oliga_Nombre is a cWebForm
+                Entry_Item liga.Nombre
+                Set piColumnSpan to 12
+                Set piColumnIndex to 0
+                Set peLabelPosition to lpTop
+                Set psLabel to "Liga"
             End_Object
             
             Object oBtnVerLigaEntrenador is a cWebButton
@@ -109,20 +178,20 @@ Object oZoomEntrenador is a cWebView
             
         End_Object
       
-      Object oNacionalidadGroup is a cWebGroup
+        Object oNacionalidadGroup is a cWebGroup
             Set piColumnIndex to 6
             Set psCSSClass to "BordesRedondeados"
 
-        Object oentrenadorNacionalidad is a cWebForm
-            Entry_Item entrenador.Nacionalidad
-            Set piColumnSpan to 12
-            Set piColumnIndex to 0
-            Set peLabelPosition to lpTop
-            Set psLabel to "Nacionalidad"
+            Object oentrenadorNacionalidad is a cWebCombo
+                Entry_Item entrenador.Nacionalidad
+                Set piColumnSpan to 12
+                Set piColumnIndex to 0
+                Set peLabelPosition to lpTop
+                Set psLabel to "Nacionalidad"
+            End_Object 
         End_Object 
-        
-      End_Object 
 
+    End_Object 
 
     Object oActionGroup is a cWebMenuGroup
 
@@ -170,12 +239,13 @@ Object oZoomEntrenador is a cWebView
 
     Procedure SetActionButtons
         tWebNavigateData NavigateData
-        Boolean bHasRecord
+        Boolean bHasRecord bHasEquipo
         Handle hoDD
 
         Get Server to hoDD
         Get GetNavigateData to NavigateData
         Get HasRecord of hoDD to bHasRecord
+        Get HasRecord of oequipo_DD to bHasEquipo
 
         // let's hide all buttons and then Show the ones we want
         WebSet pbRender of oEditBtn to False
@@ -191,6 +261,11 @@ Object oZoomEntrenador is a cWebView
             WebSet pbRender of oCancelChangesBtn to True
             WebSet pbRender of oDeleteBtn to bHasRecord
         End
+
+        // Mostrar u ocultar botones relacionados con el equipo según si tiene uno asignado
+        WebSet pbRender of oBtnDespedir to bHasEquipo
+        WebSet pbRender of oBtnVerEquipoEntrenador to bHasEquipo
+        WebSet pbRender of oBtnVerLigaEntrenador to bHasEquipo
     End_Procedure
 
     Procedure OnViewSaved Handle hoServer Boolean bChanged
@@ -225,5 +300,4 @@ Object oZoomEntrenador is a cWebView
 
     End_Procedure
 
-End_Object 
-End_Object 
+End_Object
