@@ -161,25 +161,15 @@ Object oZoomEquipo is a cWebView
     End_Procedure
 
     Procedure OnNavigateForward tWebNavigateData NavigateData Integer hoInvokingView Integer hoInvokingObject
-        Case Begin
-            Case (NavigateData.eNavigateType = nfFromMain)
-                // If from main, this is a propbably a main file Select to Zoom.
-                Case Break
-
-            Case (NavigateData.eNavigateType = nfFromParent)
-                // If from parent, this is a constrained drill down.
-                Case Break
-
-            Case (NavigateData.eNavigateType = nfFromChild)
-                // If from child, this is a probably a parent Zoom from a Zoom.
-                Case Break
-
-            Case Else // must be nfUndefined
-
-        Case End
-
+        // Si venimos directamente desde oZoomLiga, ocultamos el botón para evitar el error de pila
+        If (hoInvokingView = oZoomLiga) Begin
+            WebSet pbRender of oBtnVerLiga to False
+        End
+        Else Begin
+            WebSet pbRender of oBtnVerLiga to True
+        End
+    
         Send SetActionButtons
-
     End_Procedure
 
 End_Object 

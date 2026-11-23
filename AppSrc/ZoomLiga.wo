@@ -12,6 +12,7 @@ Use cWebColumn.pkg
 
 Use cligaDataDictionary.dd
 Use cequipoDataDictionary.dd
+Use ZoomEquipo.wo
 
 Object oZoomLiga is a cWebView
     Set piColumnCount to 12
@@ -45,21 +46,21 @@ Object oZoomLiga is a cWebView
             Set pbShowBorder to True
             Set psCSSClass to "BordesRedondeados"
 
-                Object oligaNombre is a cWebForm
-                    Entry_Item liga.Nombre
-                    Set piColumnSpan to 5
-                    Set piColumnIndex to 0
-                    Set peLabelPosition to lpTop
-                    Set psLabel to "Nombre"
-                End_Object 
-                
-                Object oligaPais is a cWebForm
-                    Entry_Item liga.Pais
-                    Set piColumnSpan to 7
-                    Set piColumnIndex to 5
-                    Set peLabelPosition to lpTop
-                    Set psLabel to "Pais"
-                End_Object 
+            Object oligaNombre is a cWebForm
+                Entry_Item liga.Nombre
+                Set piColumnSpan to 5
+                Set piColumnIndex to 0
+                Set peLabelPosition to lpTop
+                Set psLabel to "Nombre"
+            End_Object 
+            
+            Object oligaPais is a cWebForm
+                Entry_Item liga.Pais
+                Set piColumnSpan to 7
+                Set piColumnIndex to 5
+                Set peLabelPosition to lpTop
+                Set psLabel to "Pais"
+            End_Object 
         End_Object
 
         Object oDetallesLigaGroup is a cWebGroup
@@ -67,46 +68,46 @@ Object oZoomLiga is a cWebView
             Set piColumnSpan to 4
             Set pbShowBorder to True
             Set psCSSClass to "BordesRedondeados"
-                Object oligaEquipos is a cWebForm
-                    Entry_Item liga.Equipos
-                    Set piColumnSpan to 7
-                    Set piColumnIndex to 0
-                    Set peLabelPosition to lpTop
-                    Set psLabel to "Equipos Actuales"
-                End_Object 
-    
-        
-                Object oligaEquiposMax is a cWebForm
-                    Entry_Item liga.EquiposMax
-                    Set piColumnSpan to 9
-                    Set piColumnIndex to 0
-                    Set peLabelPosition to lpTop
-                    Set psLabel to "Maximos Equipos"
-                End_Object
+
+            Object oligaEquipos is a cWebForm
+                Entry_Item liga.Equipos
+                Set piColumnSpan to 7
+                Set piColumnIndex to 0
+                Set peLabelPosition to lpTop
+                Set psLabel to "Equipos Actuales"
+            End_Object 
+
+            Object oligaEquiposMax is a cWebForm
+                Entry_Item liga.EquiposMax
+                Set piColumnSpan to 9
+                Set piColumnIndex to 0
+                Set peLabelPosition to lpTop
+                Set psLabel to "Maximos Equipos"
+            End_Object
         End_Object   
         
         // 2. Lista incrustada de los equipos participantes
-        Object oListaEquiposGroup is a cWebGroup
-            Set psCSSClass to "BordesRedondeados"
-            Set psCaption to "Equipos Participantes"
-            Set piColumnSpan to 12
-
-            Object oListaEquipos is a cWebList
-                Set piColumnSpan to 0
-                Set piHeight to 250
-                Set Server to oequipo_DD // Conecta la lista al diccionario hijo
-                Set pbDataAware to True // Indica a la lista que cargue datos de la base de datos automáticamente
-                Set piOrdering to -1
-                Set peDbGridType to gtAllData
-
-                Object oEquipoNombreCol is a cWebColumn
-                    Entry_Item equipo.Nombre
-                    Set psCaption to "Nombre del Equipo"
-                    Set piWidth to 100
-                End_Object
-                
+        Object oListaEquipos is a cWebList
+            Set piColumnSpan to 0
+            Set piHeight to 250
+            Set Server to oequipo_DD
+            Set pbDataAware to True
+            Set piOrdering to -1
+            Set peDbGridType to gtAllData
+            Set pbServerOnRowClick to True
+        
+            // Registrar la ruta de navegación hacia ZoomEquipo
+            WebRegisterPath ntNavigateForward oZoomEquipo
+        
+            Object oEquipoNombreCol is a cWebColumn
+                Entry_Item equipo.Nombre
+                Set psCaption to "Nombre del Equipo"
+                Set piWidth to 100
             End_Object
-            
+        
+            Procedure OnRowClick String sRowID
+                Send NavigatePath
+            End_Procedure
         End_Object
         
     End_Object
@@ -126,6 +127,7 @@ Object oZoomLiga is a cWebView
         Object oEditBtn is a cWebMenuItem
             Set psCSSClass to "WebEditMenuItem"
             Set psCaption to "Editar"
+
             Procedure OnClick
                 Send ChangeEditMode True
                 Send SetActionButtons
@@ -148,6 +150,7 @@ Object oZoomLiga is a cWebView
             Set psCSSClass to "WebIcon_Refresh"
             Set psCaption to "Descartar Cambios"
             Set peActionDisplay to adMenu
+
             Procedure OnClick
                 Send RefreshRecord
             End_Procedure
@@ -191,25 +194,15 @@ Object oZoomLiga is a cWebView
     End_Procedure
 
     Procedure OnNavigateForward tWebNavigateData NavigateData Integer hoInvokingView Integer hoInvokingObject
-        Case Begin
-            Case (NavigateData.eNavigateType = nfFromMain)
-                // Si viene de Main, probablemente es un Select de archivo principal a Zoom.
-                Case Break
-
-            Case (NavigateData.eNavigateType = nfFromParent)
-                // Si viene de Parent, es una navegacion restringida (drill down).
-                Case Break
-
-            Case (NavigateData.eNavigateType = nfFromChild)
-                // Si viene de Child, probablemente es un Zoom padre desde un Zoom.
-                Case Break
-
-            Case Else // Debe ser nfUndefined
-
-        Case End
+        // Si venimos desde oZoomEquipo, desactivamos el clic en la lista para evitar el error de pila
+        If (hoInvokingView = oZoomEquipo) Begin
+            WebSet pbServerOnRowClick of oListaEquipos to False
+        End
+        Else Begin
+            WebSet pbServerOnRowClick of oListaEquipos to True
+        End
 
         Send SetActionButtons
-
     End_Procedure
 
 End_Object
