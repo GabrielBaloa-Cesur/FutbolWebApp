@@ -7,6 +7,7 @@ Use cWebPanel.pkg
 Use cWebMenuGroup.pkg
 Use cWebMenuItem.pkg
 Use cWebForm.pkg
+Use sql.pkg
 
 Use cligaDataDictionary.dd
 Use cequipoDataDictionary.dd
@@ -84,6 +85,35 @@ Object oZoomEntrenador is a cWebView
                 
                 Procedure OnClick
                     Send NavigatePath
+                End_Procedure
+            End_Object
+            
+            Object oBtnDespedir is a cWebButton
+                Set piColumnSpan to 0
+                Set psCaption to "Despedir"
+                Set psCSSClass to "WebButton"
+
+                Procedure OnClick
+                    Handle hoSQLMngr hdbc hstmt
+                    Integer iEntrenadorID
+                    Boolean bHasEquipo
+
+                    Get HasRecord of oequipo_DD to bHasEquipo
+                    If (bHasEquipo) Begin
+                        Get Field_Current_Value of oentrenador_DD Field entrenador.ID to iEntrenadorID
+
+                        // Ejecutamos UPDATE con NULL real en MySQL
+                        Get Create (RefClass(cSQLHandleManager)) to hoSQLMngr
+                        Get SQLFileConnect of hoSQLMngr entrenador.File_number to hdbc
+                        Get SQLOpen of hdbc to hstmt
+                        Send SQLExecDirect of hstmt ("UPDATE entrenador SET EquipoID = NULL WHERE ID = " + String(iEntrenadorID))
+                        Send SQLClose of hstmt
+                        Send SQLDisconnect of hdbc
+                        Send Destroy of hoSQLMngr
+
+                        // Cerramos la vista para refrescar los datos al volver
+                        Send NavigateClose Self
+                    End
                 End_Procedure
             End_Object
 
@@ -170,12 +200,13 @@ Object oZoomEntrenador is a cWebView
 
     Procedure SetActionButtons
         tWebNavigateData NavigateData
-        Boolean bHasRecord
+        Boolean bHasRecord bHasEquipo
         Handle hoDD
 
         Get Server to hoDD
         Get GetNavigateData to NavigateData
         Get HasRecord of hoDD to bHasRecord
+        Get HasRecord of oequipo_DD to bHasEquipo
 
         // let's hide all buttons and then Show the ones we want
         WebSet pbRender of oEditBtn to False
@@ -191,6 +222,11 @@ Object oZoomEntrenador is a cWebView
             WebSet pbRender of oCancelChangesBtn to True
             WebSet pbRender of oDeleteBtn to bHasRecord
         End
+
+        // Mostrar u ocultar botones relacionados con el equipo según si tiene uno asignado
+        WebSet pbRender of oBtnDespedir to bHasEquipo
+        WebSet pbRender of oBtnVerEquipoEntrenador to bHasEquipo
+        WebSet pbRender of oBtnVerLigaEntrenador to bHasEquipo
     End_Procedure
 
     Procedure OnViewSaved Handle hoServer Boolean bChanged
