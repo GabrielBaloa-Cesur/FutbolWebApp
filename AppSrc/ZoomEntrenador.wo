@@ -8,6 +8,7 @@ Use cWebMenuGroup.pkg
 Use cWebMenuItem.pkg
 Use cWebForm.pkg
 Use sql.pkg
+Use cWebCombo.pkg
 
 Use cligaDataDictionary.dd
 Use cequipoDataDictionary.dd
@@ -26,7 +27,7 @@ Object oZoomEntrenador is a cWebView
     End_Object 
 
     Object oequipo_DD is a cequipoDataDictionary
-        Set DDO_Server To oliga_DD
+        Set DDO_Server to oliga_DD
     End_Object 
 
     Object oentrenador_DD is a centrenadorDataDictionary
@@ -55,8 +56,8 @@ Object oZoomEntrenador is a cWebView
         End_Procedure
     End_Object
 
-    Set Main_DD To oentrenador_DD
-    Set Server  To oentrenador_DD
+    Set Main_DD to oentrenador_DD
+    Set Server  to oentrenador_DD
 
 
     Object oWebMainPanel is a cWebPanel
@@ -155,12 +156,12 @@ Object oZoomEntrenador is a cWebView
                 End_Procedure
             End_Object
 
-           Object oliga_Nombre is a cWebForm
-               Entry_Item liga.Nombre
-               Set piColumnSpan to 12
-               Set piColumnIndex to 0
-               Set peLabelPosition to lpTop
-               Set psLabel to "Liga"
+            Object oliga_Nombre is a cWebForm
+                Entry_Item liga.Nombre
+                Set piColumnSpan to 12
+                Set piColumnIndex to 0
+                Set peLabelPosition to lpTop
+                Set psLabel to "Liga"
             End_Object
             
             Object oBtnVerLigaEntrenador is a cWebButton
@@ -177,20 +178,20 @@ Object oZoomEntrenador is a cWebView
             
         End_Object
       
-      Object oNacionalidadGroup is a cWebGroup
+        Object oNacionalidadGroup is a cWebGroup
             Set piColumnIndex to 6
             Set psCSSClass to "BordesRedondeados"
 
-        Object oentrenadorNacionalidad is a cWebForm
-            Entry_Item entrenador.Nacionalidad
-            Set piColumnSpan to 12
-            Set piColumnIndex to 0
-            Set peLabelPosition to lpTop
-            Set psLabel to "Nacionalidad"
+            Object oentrenadorNacionalidad is a cWebCombo
+                Entry_Item entrenador.Nacionalidad
+                Set piColumnSpan to 12
+                Set piColumnIndex to 0
+                Set peLabelPosition to lpTop
+                Set psLabel to "Nacionalidad"
+            End_Object 
         End_Object 
-        
-      End_Object 
 
+    End_Object 
 
     Object oActionGroup is a cWebMenuGroup
 
@@ -298,7 +299,5 @@ Object oZoomEntrenador is a cWebView
         Send SetActionButtons
 
     End_Procedure
-    
 
-    End_Object 
-End_Object 
+End_Object
